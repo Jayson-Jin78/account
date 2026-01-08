@@ -105,7 +105,7 @@ async function loadDataFromSheets() {
     } catch (error) {
         console.error('데이터 로드 실패:', error);
         hideLoading();
-        showError('데이터 로드에 실패했습니다11: ' + error.message);
+        showError('데이터 로드에 실패했습니다!: ' + error.message);
     }
 }
 
