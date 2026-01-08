@@ -1,4 +1,4 @@
-// 저축 테이블 로드
+// ?��??�이�?로드
 function loadSavingsTable() {
     const body = document.getElementById('savings-body');
     const summary = document.getElementById('savings-summary');
@@ -10,10 +10,10 @@ function loadSavingsTable() {
     let totalTax = 0;
     let totalMaturity = 0;
 
-    SAMPLE_DATA.savings.forEach((s, index) => {
+    APP_DATA.savings.forEach((s, index) => {
         const row = document.createElement('tr');
         
-        // 현재 평가액
+        // ?�재 ?��???
         const currentValue = getCurrentValue(s);
         const maturityInterest = calculateMaturityInterest(s);
         const tax = calculateTax(s);
@@ -46,18 +46,18 @@ function loadSavingsTable() {
         body.appendChild(row);
     });
 
-    // 요약 정보 업데이트
-    summary.textContent = `총 저축: ${SAMPLE_DATA.savings.length}개 | ` +
-        `현재 평가액: ${formatNumber(Math.round(totalCurrentValue))} | ` +
-        `만기 예상 이자: ${formatNumber(Math.round(totalInterest))} | ` +
-        `이자소득세: ${formatNumber(Math.round(totalTax))} | ` +
-        `만기 수령액(세후): ${formatNumber(Math.round(totalMaturity))}`;
+    // ?�약 ?�보 ?�데?�트
+    summary.textContent = `�??��? ${APP_DATA.savings.length}�?| ` +
+        `?�재 ?��??? ${formatNumber(Math.round(totalCurrentValue))} | ` +
+        `만기 ?�상 ?�자: ${formatNumber(Math.round(totalInterest))} | ` +
+        `?�자?�득?? ${formatNumber(Math.round(totalTax))} | ` +
+        `만기 ?�령???�후): ${formatNumber(Math.round(totalMaturity))}`;
 }
 
-// 저축 행 추가
+// ?��???추�?
 function addSavingsRow() {
     const newSavings = {
-        name: "새 저축 상품",
+        name: "???��??�품",
         holder: "",
         principal: 0,
         monthlyPayment: 0,
@@ -67,41 +67,41 @@ function addSavingsRow() {
         notes: ""
     };
 
-    SAMPLE_DATA.savings.push(newSavings);
+    APP_DATA.savings.push(newSavings);
     loadSavingsTable();
     createSavingsChart();
     updateSummary();
     
-    // 구글 시트에 저장 (로그인된 경우)
+    // 구�? ?�트???�??(로그?�된 경우)
     if (typeof saveSavingsToSheet === 'function' && gapi.client.getToken()) {
         saveSavingsToSheet();
     }
 }
 
-// 저축 행 삭제
+// ?��?????��
 function deleteSavingsRow() {
     const selectedRows = document.querySelectorAll('#savings-body tr.selected');
     
     if (selectedRows.length === 0) {
-        alert('삭제할 항목을 선택하세요.');
+        alert('??��????��???�택?�세??');
         return;
     }
 
-    if (confirm('선택한 항목을 삭제하시겠습니까?')) {
+    if (confirm('?�택????��????��?�시겠습?�까?')) {
         const indices = Array.from(selectedRows).map(row => {
             return Array.from(row.parentNode.children).indexOf(row);
         });
 
-        // 역순으로 삭제
+        // ??��?�로 ??��
         indices.sort((a, b) => b - a).forEach(index => {
-            SAMPLE_DATA.savings.splice(index, 1);
+            APP_DATA.savings.splice(index, 1);
         });
 
         loadSavingsTable();
         createSavingsChart();
         updateSummary();
         
-        // 구글 시트에 저장 (로그인된 경우)
+        // 구�? ?�트???�??(로그?�된 경우)
         if (typeof saveSavingsToSheet === 'function' && gapi.client.getToken()) {
             saveSavingsToSheet();
         }
