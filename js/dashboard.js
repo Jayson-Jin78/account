@@ -151,11 +151,9 @@ function createExpenseChart() {
     const ctx = document.getElementById('expense-chart');
     if (!ctx) return;
 
-    
     const months = Object.keys(APP_DATA.expenses).sort().slice(-6);
     const categories = APP_DATA.expenseCategories;
 
-    
     const categoryTotals = {};
     categories.forEach(cat => {
         categoryTotals[cat] = months.reduce((sum, month) => {
@@ -167,13 +165,31 @@ function createExpenseChart() {
         .filter(cat => categoryTotals[cat] > 0)
         .sort((a, b) => categoryTotals[b] - categoryTotals[a]);
 
-    
     const datasets = sortedCategories.map((cat, idx) => {
         return {
             label: cat,
             data: months.map(month => APP_DATA.expenses[month][cat] || 0),
-            backgroundColor: generateColors(sortedCategories.length)[idx]
+            backgroundColor: generateColors(sortedCategories.length)[idx],
+            stack: 'expenses',
+            type: 'bar'
         };
+    });
+
+    const incomeData = months.map(month => {
+        const income = APP_DATA.income[month];
+        if (!income) return 0;
+        return Object.values(income).reduce((sum, val) => sum + val, 0);
+    });
+
+    datasets.push({
+        label: 'Total Income',
+        data: incomeData,
+        borderColor: 'rgb(75, 192, 192)',
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        borderWidth: 3,
+        type: 'line',
+        yAxisID: 'y',
+        order: 0
     });
 
     if (expenseChart) {
@@ -189,6 +205,10 @@ function createExpenseChart() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
             plugins: {
                 legend: {
                     position: 'bottom',

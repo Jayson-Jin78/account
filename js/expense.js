@@ -4,41 +4,47 @@ function loadExpenseTable() {
     const header = document.getElementById('expense-header');
     const body = document.getElementById('expense-body');
 
-    
     const months = Object.keys(APP_DATA.expenses).sort().slice(-6);
     const categories = APP_DATA.expenseCategories;
 
-    header.innerHTML = '<th>??/th>' + 
-        categories.map(cat => `<th>${cat}</th>`).join('') + 
-        '<th>총액</th>';
+    const categoryTotals = {};
+    categories.forEach(cat => {
+        categoryTotals[cat] = months.reduce((sum, month) => {
+            return sum + (APP_DATA.expenses[month][cat] || 0);
+        }, 0);
+    });
 
-    
+    const sortedCategories = categories
+        .slice()
+        .sort((a, b) => categoryTotals[b] - categoryTotals[a]);
+
+    header.innerHTML = '<th>Category</th>' + 
+        months.map(month => `<th>${month}</th>`).join('') + 
+        '<th>Total</th>';
+
     body.innerHTML = '';
-    months.forEach(month => {
+    
+    sortedCategories.forEach(category => {
         const row = document.createElement('tr');
-        const monthData = APP_DATA.expenses[month];
         
-        
-        const monthCell = document.createElement('td');
-        monthCell.textContent = month;
-        monthCell.classList.add('total-col');
-        row.appendChild(monthCell);
+        const categoryCell = document.createElement('td');
+        categoryCell.textContent = category;
+        categoryCell.classList.add('total-col');
+        row.appendChild(categoryCell);
 
-        
         let rowTotal = 0;
-        categories.forEach(cat => {
+        months.forEach(month => {
             const cell = document.createElement('td');
-            const value = monthData[cat] || 0;
+            const value = APP_DATA.expenses[month][category] || 0;
             cell.textContent = value > 0 ? formatNumber(value) : '-';
             cell.contentEditable = true;
             cell.dataset.month = month;
-            cell.dataset.category = cat;
+            cell.dataset.category = category;
             cell.addEventListener('blur', updateExpenseCell);
             row.appendChild(cell);
             rowTotal += value;
         });
 
-        
         const totalCell = document.createElement('td');
         totalCell.textContent = formatNumber(rowTotal);
         totalCell.classList.add('total-col');
@@ -47,24 +53,22 @@ function loadExpenseTable() {
         body.appendChild(row);
     });
 
-    
     const totalRow = document.createElement('tr');
     totalRow.classList.add('total-row');
-    totalRow.innerHTML = '<td>총액</td>';
+    totalRow.innerHTML = '<td>Total</td>';
 
     let grandTotal = 0;
-    categories.forEach(cat => {
-        const catTotal = months.reduce((sum, month) => {
+    months.forEach(month => {
+        const monthTotal = categories.reduce((sum, cat) => {
             return sum + (APP_DATA.expenses[month][cat] || 0);
         }, 0);
-        totalRow.innerHTML += `<td>${formatNumber(catTotal)}</td>`;
-        grandTotal += catTotal;
+        totalRow.innerHTML += `<td>${formatNumber(monthTotal)}</td>`;
+        grandTotal += monthTotal;
     });
 
     totalRow.innerHTML += `<td>${formatNumber(grandTotal)}</td>`;
     body.appendChild(totalRow);
 }
-
 
 function updateExpenseCell(e) {
     const cell = e.target;
@@ -77,19 +81,32 @@ function updateExpenseCell(e) {
     createExpenseChart();
     updateSummary();
     
-    
     if (typeof saveTransactionsToSheet === 'function' && gapi.client.getToken()) {
         saveTransactionsToSheet();
     }
 }
 
 
-// 지출 행 추가
 function addExpenseRow() {
-    alert('지출 데이터는 월별로 자동 생성됩니다.\n셀을 직접 편집하여 금액을 입력하세요.');
+    const newMonth = prompt('Add new month (YYYY-MM format):');
+    if (!newMonth || !/^\d{4}-\d{2}$/.test(newMonth)) {
+        alert('Invalid format. Please use YYYY-MM format.');
+        return;
+    }
+    
+    if (!APP_DATA.expenses[newMonth]) {
+        APP_DATA.expenses[newMonth] = {};
+        APP_DATA.expenseCategories.forEach(cat => {
+            APP_DATA.expenses[newMonth][cat] = 0;
+        });
+        loadExpenseTable();
+        createExpenseChart();
+        updateSummary();
+    } else {
+        alert('This month already exists.');
+    }
 }
 
-// 지출 행 삭제
 function deleteExpenseRow() {
-    alert('지출 데이터를 삭제하려면 해당 셀의 금액을 0으로 설정하세요.');
+    alert('To delete expense data, set all amounts to 0.');
 }
