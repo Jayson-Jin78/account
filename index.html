@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>재정 관리</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/google-sheets.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- 헤더 -->
+        <header>
+            <h1>💰 재정 관리</h1>
+            <div class="auth-buttons">
+                <button id="authorize-btn" onclick="handleAuthClick()" style="display: none;">
+                    구글 계정으로 로그인
+                </button>
+                <button id="signout-btn" onclick="handleSignoutClick()" style="display: none;">
+                    로그아웃
+                </button>
+            </div>
+            <div id="loading-indicator" style="display: none; color: white; margin-top: 10px;">
+                로딩 중...
+            </div>
+        </header>
+
+        <!-- 탭 네비게이션 -->
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="dashboard">재정 현황</button>
+            <button class="tab-btn" data-tab="income">수입 관리</button>
+            <button class="tab-btn" data-tab="expense">지출 관리</button>
+            <button class="tab-btn" data-tab="savings">저축 관리</button>
+        </nav>
+
+        <!-- 탭 컨텐츠 -->
+        <main>
+            <!-- 재정 현황 탭 -->
+            <div id="dashboard" class="tab-content active">
+                <div class="summary-panel">
+                    <div class="summary-item">
+                        <span class="label">총 자산</span>
+                        <span class="value" id="total-assets">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">이번 달 수입</span>
+                        <span class="value" id="monthly-income">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">이번 달 지출</span>
+                        <span class="value" id="monthly-expense">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">이번 달 순수익</span>
+                        <span class="value" id="monthly-balance">0</span>
+                    </div>
+                </div>
+
+                <div class="charts-container">
+                    <div class="chart-box">
+                        <h3>저축 자산 구성</h3>
+                        <canvas id="savings-chart"></canvas>
+                    </div>
+                    <div class="chart-box">
+                        <h3>월별 카테고리별 지출</h3>
+                        <canvas id="expense-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 수입 관리 탭 -->
+            <div id="income" class="tab-content">
+                <div class="table-controls">
+                    <button class="btn btn-primary" onclick="addIncomeRow()">행 추가</button>
+                    <button class="btn btn-secondary" onclick="deleteIncomeRow()">선택 삭제</button>
+                </div>
+                <div class="table-wrapper">
+                    <table id="income-table">
+                        <thead>
+                            <tr id="income-header"></tr>
+                        </thead>
+                        <tbody id="income-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 지출 관리 탭 -->
+            <div id="expense" class="tab-content">
+                <div class="table-controls">
+                    <button class="btn btn-primary" onclick="addExpenseRow()">행 추가</button>
+                    <button class="btn btn-secondary" onclick="deleteExpenseRow()">선택 삭제</button>
+                </div>
+                <div class="table-wrapper">
+                    <table id="expense-table">
+                        <thead>
+                            <tr id="expense-header"></tr>
+                        </thead>
+                        <tbody id="expense-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 저축 관리 탭 -->
+            <div id="savings" class="tab-content">
+                <div class="table-controls">
+                    <button class="btn btn-primary" onclick="addSavingsRow()">행 추가</button>
+                    <button class="btn btn-secondary" onclick="deleteSavingsRow()">선택 삭제</button>
+                </div>
+                <div class="summary-label" id="savings-summary"></div>
+                <div class="table-wrapper">
+                    <table id="savings-table">
+                        <thead>
+                            <tr>
+                                <th>예금명</th>
+                                <th>예금주</th>
+                                <th>잔액</th>
+                                <th>월납액</th>
+                                <th>이자율(%)</th>
+                                <th>신규일</th>
+                                <th>만기일</th>
+                                <th>현재평가액</th>
+                                <th>예상이자</th>
+                                <th>이자소득세</th>
+                                <th>만기수령액</th>
+                                <th>비고</th>
+                            </tr>
+                        </thead>
+                        <tbody id="savings-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/sample-data.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/google-sheets.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/income.js"></script>
+    <script src="js/expense.js"></script>
+    <script src="js/savings.js"></script>
+</body>
+</html>
