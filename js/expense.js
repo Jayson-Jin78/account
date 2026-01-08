@@ -1,10 +1,10 @@
-// 지�??�이�?로드
+
 function loadExpenseTable() {
     const table = document.getElementById('expense-table');
     const header = document.getElementById('expense-header');
     const body = document.getElementById('expense-body');
 
-    // ?�더 ?�성
+    
     const months = Object.keys(APP_DATA.expenses).sort().slice(-6);
     const categories = APP_DATA.expenseCategories;
 
@@ -12,19 +12,19 @@ function loadExpenseTable() {
         categories.map(cat => `<th>${cat}</th>`).join('') + 
         '<th>총액</th>';
 
-    // ?�이?????�성
+    
     body.innerHTML = '';
     months.forEach(month => {
         const row = document.createElement('tr');
         const monthData = APP_DATA.expenses[month];
         
-        // ???�
+        
         const monthCell = document.createElement('td');
         monthCell.textContent = month;
         monthCell.classList.add('total-col');
         row.appendChild(monthCell);
 
-        // 카테고리�??�
+        
         let rowTotal = 0;
         categories.forEach(cat => {
             const cell = document.createElement('td');
@@ -38,7 +38,7 @@ function loadExpenseTable() {
             rowTotal += value;
         });
 
-        // ?�별 총액
+        
         const totalCell = document.createElement('td');
         totalCell.textContent = formatNumber(rowTotal);
         totalCell.classList.add('total-col');
@@ -47,7 +47,7 @@ function loadExpenseTable() {
         body.appendChild(row);
     });
 
-    // 총액 ??추�?
+    
     const totalRow = document.createElement('tr');
     totalRow.classList.add('total-row');
     totalRow.innerHTML = '<td>총액</td>';
@@ -65,7 +65,7 @@ function loadExpenseTable() {
     body.appendChild(totalRow);
 }
 
-// 지�??� ?�데?�트
+
 function updateExpenseCell(e) {
     const cell = e.target;
     const month = cell.dataset.month;
@@ -77,18 +77,19 @@ function updateExpenseCell(e) {
     createExpenseChart();
     updateSummary();
     
-    // 구�? ?�트???�??(로그?�된 경우)
+    
     if (typeof saveTransactionsToSheet === 'function' && gapi.client.getToken()) {
         saveTransactionsToSheet();
     }
 }
 
-// 지�???추�?
+
+// 지출 행 추가
 function addExpenseRow() {
-    alert('지�??�이?�는 ?�별�??�동 ?�성?�니??\n?�??직접 ?�집?�여 금액???�력?�세??');
+    alert('지출 데이터는 월별로 자동 생성됩니다.\n셀을 직접 편집하여 금액을 입력하세요.');
 }
 
-// 지�?????��
+// 지출 행 삭제
 function deleteExpenseRow() {
-    alert('지�??�이?��? ??��?�려�??�당 ?�??금액??0?�로 ?�정?�세??');
+    alert('지출 데이터를 삭제하려면 해당 셀의 금액을 0으로 설정하세요.');
 }

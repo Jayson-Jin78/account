@@ -1,4 +1,4 @@
-// ?ÄÏ∂??åÏù¥Î∏?Î°úÎìú
+
 function loadSavingsTable() {
     const body = document.getElementById('savings-body');
     const summary = document.getElementById('savings-summary');
@@ -13,7 +13,7 @@ function loadSavingsTable() {
     APP_DATA.savings.forEach((s, index) => {
         const row = document.createElement('tr');
         
-        // ?ÑÏû¨ ?âÍ???
+        
         const currentValue = getCurrentValue(s);
         const maturityInterest = calculateMaturityInterest(s);
         const tax = calculateTax(s);
@@ -46,18 +46,18 @@ function loadSavingsTable() {
         body.appendChild(row);
     });
 
-    // ?îÏïΩ ?ïÎ≥¥ ?ÖÎç∞?¥Ìä∏
-    summary.textContent = `Ï¥??ÄÏ∂? ${APP_DATA.savings.length}Í∞?| ` +
-        `?ÑÏû¨ ?âÍ??? ${formatNumber(Math.round(totalCurrentValue))} | ` +
-        `ÎßåÍ∏∞ ?àÏÉÅ ?¥Ïûê: ${formatNumber(Math.round(totalInterest))} | ` +
-        `?¥Ïûê?åÎìù?? ${formatNumber(Math.round(totalTax))} | ` +
-        `ÎßåÍ∏∞ ?òÎ†π???∏ÌõÑ): ${formatNumber(Math.round(totalMaturity))}`;
+    
+    summary.textContent = `Ï¥ù Ï†ÄÏ∂ï: ${SAMPLE_DATA.savings.length}Í∞ú | ` +
+        `ÌòÑÏû¨ ÌèâÍ∞ÄÏï°: ${formatNumber(Math.round(totalCurrentValue))} | ` +
+        `ÎßåÍ∏∞ ÏòàÏÉÅ Ïù¥Ïûê: ${formatNumber(Math.round(totalInterest))} | ` +
+        `Ïù¥ÏûêÏÜåÎìùÏÑ∏: ${formatNumber(Math.round(totalTax))} | ` +
+        `ÎßåÍ∏∞ ÏàòÎ†πÏï°(ÏÑ∏ÌõÑ): ${formatNumber(Math.round(totalMaturity))}`;
 }
 
-// ?ÄÏ∂???Ï∂îÍ?
+
 function addSavingsRow() {
     const newSavings = {
-        name: "???ÄÏ∂??ÅÌíà",
+        name: "ÏÉà Ï†ÄÏ∂ï ÏÉÅÌíà",
         holder: "",
         principal: 0,
         monthlyPayment: 0,
@@ -72,27 +72,27 @@ function addSavingsRow() {
     createSavingsChart();
     updateSummary();
     
-    // Íµ¨Í? ?úÌä∏???Ä??(Î°úÍ∑∏?∏Îêú Í≤ΩÏö∞)
+    
     if (typeof saveSavingsToSheet === 'function' && gapi.client.getToken()) {
         saveSavingsToSheet();
     }
 }
 
-// ?ÄÏ∂?????†ú
+
 function deleteSavingsRow() {
     const selectedRows = document.querySelectorAll('#savings-body tr.selected');
     
     if (selectedRows.length === 0) {
-        alert('??†ú????™©???†ÌÉù?òÏÑ∏??');
+        alert('ÏÇ≠Ï†úÌï† Ìï≠Î™©ÏùÑ ÏÑ†ÌÉùÌïòÏÑ∏Ïöî.');
         return;
     }
 
-    if (confirm('?†ÌÉù????™©????†ú?òÏãúÍ≤†Ïäµ?àÍπå?')) {
+    if (confirm('ÏÑ†ÌÉùÌïú Ìï≠Î™©ÏùÑ ÏÇ≠Ï†úÌïòÏãúÍ≤†ÏäµÎãàÍπå?')) {
         const indices = Array.from(selectedRows).map(row => {
             return Array.from(row.parentNode.children).indexOf(row);
         });
 
-        // ??àú?ºÎ°ú ??†ú
+        
         indices.sort((a, b) => b - a).forEach(index => {
             APP_DATA.savings.splice(index, 1);
         });
@@ -101,7 +101,7 @@ function deleteSavingsRow() {
         createSavingsChart();
         updateSummary();
         
-        // Íµ¨Í? ?úÌä∏???Ä??(Î°úÍ∑∏?∏Îêú Í≤ΩÏö∞)
+        
         if (typeof saveSavingsToSheet === 'function' && gapi.client.getToken()) {
             saveSavingsToSheet();
         }

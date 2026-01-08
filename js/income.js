@@ -1,10 +1,10 @@
-// ?�입 ?�이�?로드
+
 function loadIncomeTable() {
     const table = document.getElementById('income-table');
     const header = document.getElementById('income-header');
     const body = document.getElementById('income-body');
 
-    // ?�더 ?�성
+    
     const months = Object.keys(APP_DATA.income).sort().slice(-6);
     const categories = APP_DATA.incomeCategories;
 
@@ -12,19 +12,19 @@ function loadIncomeTable() {
         categories.map(cat => `<th>${cat}</th>`).join('') + 
         '<th>총액</th>';
 
-    // ?�이?????�성
+    
     body.innerHTML = '';
     months.forEach(month => {
         const row = document.createElement('tr');
         const monthData = APP_DATA.income[month];
         
-        // ???�
+        
         const monthCell = document.createElement('td');
         monthCell.textContent = month;
         monthCell.classList.add('total-col');
         row.appendChild(monthCell);
 
-        // 카테고리�??�
+        
         let rowTotal = 0;
         categories.forEach(cat => {
             const cell = document.createElement('td');
@@ -38,7 +38,7 @@ function loadIncomeTable() {
             rowTotal += value;
         });
 
-        // ?�별 총액
+        
         const totalCell = document.createElement('td');
         totalCell.textContent = formatNumber(rowTotal);
         totalCell.classList.add('total-col');
@@ -47,7 +47,7 @@ function loadIncomeTable() {
         body.appendChild(row);
     });
 
-    // 총액 ??추�?
+    
     const totalRow = document.createElement('tr');
     totalRow.classList.add('total-row');
     totalRow.innerHTML = '<td>총액</td>';
@@ -65,7 +65,7 @@ function loadIncomeTable() {
     body.appendChild(totalRow);
 }
 
-// ?�입 ?� ?�데?�트
+
 function updateIncomeCell(e) {
     const cell = e.target;
     const month = cell.dataset.month;
@@ -76,18 +76,19 @@ function updateIncomeCell(e) {
     loadIncomeTable();
     updateSummary();
     
-    // 구�? ?�트???�??(로그?�된 경우)
+    
     if (typeof saveTransactionsToSheet === 'function' && gapi.client.getToken()) {
         saveTransactionsToSheet();
     }
 }
 
-// ?�입 ??추�?
+
+// 수입 행 추가
 function addIncomeRow() {
-    alert('?�입 ?�이?�는 ?�별�??�동 ?�성?�니??\\n?�??직접 ?�집?�여 금액???�력?�세??');
+    alert('수입 데이터는 월별로 자동 생성됩니다.\\n셀을 직접 편집하여 금액을 입력하세요.');
 }
 
-// ?�입 ????��
+// 수입 행 삭제
 function deleteIncomeRow() {
-    alert('?�입 ?�이?��? ??��?�려�??�당 ?�??금액??0?�로 ?�정?�세??');
+    alert('수입 데이터를 삭제하려면 해당 셀의 금액을 0으로 설정하세요.');
 }
