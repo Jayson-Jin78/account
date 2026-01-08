@@ -1,9 +1,9 @@
-// Google Sheets API 통합
+
 let gapiInited = false;
 let gisInited = false;
 let tokenClient;
 
-// API 초기화
+
 function initGoogleAPI() {
     if (!validateConfig()) {
         showError('구글 시트 API 설정이 필요합니다. GOOGLE_SHEETS_SETUP.md 파일을 참고하세요.');
@@ -15,11 +15,11 @@ function initGoogleAPI() {
     tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: CONFIG.CLIENT_ID,
         scope: CONFIG.SCOPES,
-        callback: '', // 나중에 설정
+        callback: '', 
     });
 }
 
-// GAPI 클라이언트 초기화
+
 async function initializeGapiClient() {
     try {
         await gapi.client.init({
@@ -33,7 +33,7 @@ async function initializeGapiClient() {
     }
 }
 
-// 버튼 활성화
+
 function maybeEnableButtons() {
     if (gapiInited && gisInited) {
         document.getElementById('authorize-btn').style.display = 'block';
@@ -41,7 +41,7 @@ function maybeEnableButtons() {
     }
 }
 
-// 로그인
+
 function handleAuthClick() {
     tokenClient.callback = async (resp) => {
         if (resp.error !== undefined) {
@@ -59,7 +59,7 @@ function handleAuthClick() {
     }
 }
 
-// 로그아웃
+
 function handleSignoutClick() {
     const token = gapi.client.getToken();
     if (token !== null) {
@@ -70,12 +70,12 @@ function handleSignoutClick() {
     }
 }
 
-// 구글 시트에서 데이터 로드
+
 async function loadDataFromSheets() {
     try {
         showLoading('데이터 로딩 중...');
         
-        // 저축 데이터 로드
+        
         const savingsData = await readSheet(CONFIG.SHEETS.SAVINGS);
         if (savingsData && savingsData.length > 1) {
             APP_DATA.savings = parseSavingsData(savingsData);
@@ -85,7 +85,7 @@ async function loadDataFromSheets() {
             APP_DATA.savings = [];
         }
         
-        // 거래 데이터 로드
+        
         const transactionsData = await readSheet(CONFIG.SHEETS.TRANSACTIONS);
         if (transactionsData && transactionsData.length > 1) {
             parseTransactionsData(transactionsData);
@@ -94,7 +94,7 @@ async function loadDataFromSheets() {
             console.log('⚠️ 거래 데이터가 비어있습니다.');
         }
         
-        // UI 업데이트
+        
         loadDashboard();
         loadIncomeTable();
         loadExpenseTable();
@@ -109,7 +109,7 @@ async function loadDataFromSheets() {
     }
 }
 
-// 시트 읽기
+
 async function readSheet(sheetName) {
     try {
         const response = await gapi.client.sheets.spreadsheets.values.get({
@@ -123,7 +123,7 @@ async function readSheet(sheetName) {
     }
 }
 
-// 시트 쓰기
+
 async function writeSheet(sheetName, data) {
     try {
         const response = await gapi.client.sheets.spreadsheets.values.update({
@@ -141,7 +141,7 @@ async function writeSheet(sheetName, data) {
     }
 }
 
-// 저축 데이터 파싱
+
 function parseSavingsData(data) {
     if (!data || data.length < 2) return [];
     
@@ -150,7 +150,7 @@ function parseSavingsData(data) {
     
     for (let i = 1; i < data.length; i++) {
         const row = data[i];
-        if (!row[0]) continue; // 빈 행 건너뛰기
+        if (!row[0]) continue; 
         
         savings.push({
             name: row[0] || '',
@@ -167,23 +167,23 @@ function parseSavingsData(data) {
     return savings;
 }
 
-// 거래 데이터 파싱
+
 function parseTransactionsData(data) {
     if (!data || data.length < 2) return;
     
-    // 거래 데이터를 APP_DATA 형식으로 변환
+    
     for (let i = 1; i < data.length; i++) {
         const row = data[i];
         if (!row[0]) continue;
         
-        const date = row[0]; // 날짜
-        const type = row[1]; // 유형
-        const category = row[2]; // 카테고리
+        const date = row[0]; 
+        const type = row[1]; 
+        const category = row[2]; 
         const amount = parseFloat(row[3]?.replace(/,/g, '')) || 0;
         
-        const month = date.substring(0, 7); // YYYY-MM
+        const month = date.substring(0, 7); 
         
-        // 월별 데이터 초기화
+        
         if (!APP_DATA.income[month]) {
             APP_DATA.income[month] = {};
             APP_DATA.incomeCategories.forEach(cat => {
@@ -197,7 +197,7 @@ function parseTransactionsData(data) {
             });
         }
         
-        // 유형에 따라 분류
+        
         if (type === '수입' && APP_DATA.incomeCategories.includes(category)) {
             APP_DATA.income[month][category] += amount;
         } else if (type === '지출' && APP_DATA.expenseCategories.includes(category)) {
@@ -206,7 +206,7 @@ function parseTransactionsData(data) {
     }
 }
 
-// 저축 데이터 저장
+
 async function saveSavingsToSheet() {
     try {
         showLoading('저장 중...');
@@ -237,7 +237,7 @@ async function saveSavingsToSheet() {
     }
 }
 
-// 거래 데이터 저장
+
 async function saveTransactionsToSheet() {
     try {
         showLoading('저장 중...');
@@ -245,7 +245,7 @@ async function saveTransactionsToSheet() {
         const headers = ['날짜', '유형', '카테고리', '금액', '메모', '반복', '주기'];
         const rows = [headers];
         
-        // 수입 데이터 변환
+        
         Object.keys(APP_DATA.income).forEach(month => {
             const income = APP_DATA.income[month];
             Object.keys(income).forEach(category => {
@@ -264,7 +264,7 @@ async function saveTransactionsToSheet() {
             });
         });
         
-        // 지출 데이터 변환
+        
         Object.keys(APP_DATA.expenses).forEach(month => {
             const expenses = APP_DATA.expenses[month];
             Object.keys(expenses).forEach(category => {
@@ -292,7 +292,7 @@ async function saveTransactionsToSheet() {
     }
 }
 
-// UI 헬퍼 함수
+
 function showLoading(message) {
     const loader = document.getElementById('loading-indicator');
     if (loader) {
@@ -316,5 +316,5 @@ function showError(message) {
     alert('❌ ' + message);
 }
 
-// 페이지 로드 시 초기화
+
 window.addEventListener('load', initGoogleAPI);

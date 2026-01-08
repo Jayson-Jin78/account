@@ -1,10 +1,10 @@
-// 데이터 저장소 (구글 시트에서 로드됨)
+
 const APP_DATA = {
     savings: [],
     income: {},
     expenses: {},
     
-    // 카테고리 정의
+    
     incomeCategories: [
         "급여", "상여금", "부업", "이자", "배당", "기타"
     ],
@@ -17,7 +17,7 @@ const APP_DATA = {
     ]
 };
 
-// 초기 월별 데이터 구조 생성
+
 function initializeMonthData(months = 6) {
     const now = new Date();
     
@@ -25,7 +25,7 @@ function initializeMonthData(months = 6) {
         const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
         const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
         
-        // 수입 초기화
+        
         if (!APP_DATA.income[monthKey]) {
             APP_DATA.income[monthKey] = {};
             APP_DATA.incomeCategories.forEach(cat => {
@@ -33,7 +33,7 @@ function initializeMonthData(months = 6) {
             });
         }
         
-        // 지출 초기화
+        
         if (!APP_DATA.expenses[monthKey]) {
             APP_DATA.expenses[monthKey] = {};
             APP_DATA.expenseCategories.forEach(cat => {
@@ -43,5 +43,5 @@ function initializeMonthData(months = 6) {
     }
 }
 
-// 앱 시작 시 초기화
+
 initializeMonthData();

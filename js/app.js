@@ -1,4 +1,4 @@
-// 메인 앱 로직
+
 document.addEventListener('DOMContentLoaded', function() {
     initTabs();
     loadDashboard();
@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loadSavingsTable();
 });
 
-// 탭 전환
+
 function initTabs() {
     const tabBtns = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
@@ -16,50 +16,50 @@ function initTabs() {
         btn.addEventListener('click', () => {
             const tabName = btn.dataset.tab;
 
-            // 모든 탭 비활성화
+            
             tabBtns.forEach(b => b.classList.remove('active'));
             tabContents.forEach(c => c.classList.remove('active'));
 
-            // 선택한 탭 활성화
+            
             btn.classList.add('active');
             document.getElementById(tabName).classList.add('active');
         });
     });
 }
 
-// 숫자 포맷팅
+
 function formatNumber(num) {
     return num.toLocaleString('ko-KR');
 }
 
-// 날짜 차이 계산 (일)
+
 function daysBetween(date1, date2) {
     const oneDay = 24 * 60 * 60 * 1000;
     return Math.round(Math.abs((date1 - date2) / oneDay));
 }
 
-// 개월 수 계산
+
 function monthsBetween(date1, date2) {
     const d1 = new Date(date1);
     const d2 = new Date(date2);
     return (d2.getFullYear() - d1.getFullYear()) * 12 + (d2.getMonth() - d1.getMonth());
 }
 
-// 단리 이자 계산
+
 function calculateSimpleInterest(principal, rate, startDate, maturityDate) {
     const days = daysBetween(new Date(startDate), new Date(maturityDate));
     const years = days / 365;
     return principal * (rate / 100) * years;
 }
 
-// 적금 이자 계산
+
 function calculateInstallmentInterest(monthlyPayment, rate, months) {
     const monthlyRate = rate / 12 / 100;
     const avgMonths = (months + 1) / 2;
     return monthlyPayment * avgMonths * monthlyRate * months;
 }
 
-// 현재까지 발생한 이자 계산
+
 function calculateInterestToDate(savings) {
     const now = new Date();
     const startDate = new Date(savings.startDate);
@@ -81,7 +81,7 @@ function calculateInterestToDate(savings) {
     }
 }
 
-// 만기 이자 계산
+
 function calculateMaturityInterest(savings) {
     if (savings.monthlyPayment > 0) {
         const months = monthsBetween(savings.startDate, savings.maturityDate);
@@ -91,7 +91,7 @@ function calculateMaturityInterest(savings) {
     }
 }
 
-// 이자소득세 계산
+
 function calculateTax(savings) {
     if (savings.notes.includes('일반과세')) {
         const interest = calculateMaturityInterest(savings);
@@ -100,7 +100,7 @@ function calculateTax(savings) {
     return 0;
 }
 
-// 현재 평가액 계산
+
 function getCurrentValue(savings) {
     const totalPrincipal = savings.monthlyPayment > 0 
         ? savings.monthlyPayment * monthsBetween(savings.startDate, savings.maturityDate)
