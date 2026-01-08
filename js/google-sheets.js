@@ -169,8 +169,16 @@ function parseSavingsData(data) {
 
 
 function parseTransactionsData(data) {
-    if (!data || data.length < 2) return;
+    if (!data || data.length < 2) {
+        console.log('⚠️ Transactions data is empty or has no rows');
+        return;
+    }
     
+    console.log('📊 Parsing transactions data:', data.length - 1, 'rows');
+    console.log('Headers:', data[0]);
+    
+    let incomeCount = 0;
+    let expenseCount = 0;
     
     for (let i = 1; i < data.length; i++) {
         const row = data[i];
@@ -180,6 +188,8 @@ function parseTransactionsData(data) {
         const type = row[1]; 
         const category = row[2]; 
         const amount = parseFloat(row[3]?.replace(/,/g, '')) || 0;
+        
+        console.log(`Row ${i}: Date=${date}, Type=${type}, Category=${category}, Amount=${amount}`);
         
         const month = date.substring(0, 7); 
         
@@ -200,10 +210,18 @@ function parseTransactionsData(data) {
         
         if (type === '수입' && APP_DATA.incomeCategories.includes(category)) {
             APP_DATA.income[month][category] += amount;
+            incomeCount++;
+            console.log(`✅ Added income: ${category} = ${amount}`);
         } else if (type === '지출' && APP_DATA.expenseCategories.includes(category)) {
             APP_DATA.expenses[month][category] += amount;
+            expenseCount++;
+            console.log(`✅ Added expense: ${category} = ${amount}`);
+        } else {
+            console.log(`⚠️ Skipped: Type="${type}", Category="${category}" not matched`);
         }
     }
+    
+    console.log(`✅ Parsed ${incomeCount} income items, ${expenseCount} expense items`);
 }
 
 
