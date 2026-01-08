@@ -180,19 +180,41 @@ function parseTransactionsData(data) {
     let incomeCount = 0;
     let expenseCount = 0;
     
+    const categoryMapping = {
+        '월급': '급여',
+        '월급여': '급여',
+        '보너스': '상여금',
+        '차량': '자동차',
+        '차량유지비': '자동차',
+        '전기': '관리비',
+        '수도': '관리비',
+        '인터넷': '통신',
+        '핸드폰': '통신',
+        '휴대폰': '통신'
+    };
+    
     for (let i = 1; i < data.length; i++) {
         const row = data[i];
         if (!row[0]) continue;
         
         const date = row[0]; 
-        const type = row[1]; 
-        const category = row[2]; 
-        const amount = parseFloat(row[3]?.replace(/,/g, '')) || 0;
+        let type = row[1]?.trim(); 
+        let category = row[2]?.trim(); 
+        const amount = parseFloat(row[3]?.toString().replace(/,/g, '')) || 0;
         
         console.log(`Row ${i}: Date=${date}, Type=${type}, Category=${category}, Amount=${amount}`);
         
-        const month = date.substring(0, 7); 
+        if (type.includes('수입')) {
+            type = '수입';
+        } else if (type.includes('지출')) {
+            type = '지출';
+        }
         
+        if (categoryMapping[category]) {
+            category = categoryMapping[category];
+        }
+        
+        const month = date.substring(0, 7); 
         
         if (!APP_DATA.income[month]) {
             APP_DATA.income[month] = {};
@@ -207,7 +229,6 @@ function parseTransactionsData(data) {
             });
         }
         
-        
         if (type === '수입' && APP_DATA.incomeCategories.includes(category)) {
             APP_DATA.income[month][category] += amount;
             incomeCount++;
@@ -218,6 +239,8 @@ function parseTransactionsData(data) {
             console.log(`✅ Added expense: ${category} = ${amount}`);
         } else {
             console.log(`⚠️ Skipped: Type="${type}", Category="${category}" not matched`);
+            console.log(`   Available income categories:`, APP_DATA.incomeCategories);
+            console.log(`   Available expense categories:`, APP_DATA.expenseCategories);
         }
     }
     
