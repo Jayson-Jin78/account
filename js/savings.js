@@ -47,7 +47,7 @@ function loadSavingsTable() {
     });
 
     
-    summary.textContent = `총 저축: ${SAMPLE_DATA.savings.length}개 | ` +
+    summary.textContent = `총 저축: ${APP_DATA.savings.length}개 | ` +
         `현재 평가액: ${formatNumber(Math.round(totalCurrentValue))} | ` +
         `만기 예상 이자: ${formatNumber(Math.round(totalInterest))} | ` +
         `이자소득세: ${formatNumber(Math.round(totalTax))} | ` +
