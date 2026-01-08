@@ -77,16 +77,21 @@ async function loadDataFromSheets() {
         
         // 저축 데이터 로드
         const savingsData = await readSheet(CONFIG.SHEETS.SAVINGS);
-        if (savingsData) {
-            SAMPLE_DATA.savings = parseSavingsData(savingsData);
-            console.log('✅ 저축 데이터 로드:', SAMPLE_DATA.savings.length, '개');
+        if (savingsData && savingsData.length > 1) {
+            APP_DATA.savings = parseSavingsData(savingsData);
+            console.log('✅ 저축 데이터 로드:', APP_DATA.savings.length, '개');
+        } else {
+            console.log('⚠️ 저축 데이터가 비어있습니다.');
+            APP_DATA.savings = [];
         }
         
-        // 지출 데이터 로드
+        // 거래 데이터 로드
         const transactionsData = await readSheet(CONFIG.SHEETS.TRANSACTIONS);
-        if (transactionsData) {
+        if (transactionsData && transactionsData.length > 1) {
             parseTransactionsData(transactionsData);
-            console.log('✅ 지출 데이터 로드 완료');
+            console.log('✅ 거래 데이터 로드 완료');
+        } else {
+            console.log('⚠️ 거래 데이터가 비어있습니다.');
         }
         
         // UI 업데이트
@@ -162,11 +167,11 @@ function parseSavingsData(data) {
     return savings;
 }
 
-// 지출 데이터 파싱
+// 거래 데이터 파싱
 function parseTransactionsData(data) {
     if (!data || data.length < 2) return;
     
-    // 지출 데이터를 SAMPLE_DATA.expenses 형식으로 변환
+    // 거래 데이터를 APP_DATA 형식으로 변환
     for (let i = 1; i < data.length; i++) {
         const row = data[i];
         if (!row[0]) continue;
@@ -174,19 +179,29 @@ function parseTransactionsData(data) {
         const date = row[0]; // 날짜
         const type = row[1]; // 유형
         const category = row[2]; // 카테고리
-        const amount = parseFloat(row[3]) || 0;
+        const amount = parseFloat(row[3]?.replace(/,/g, '')) || 0;
         
-        if (type === '고정지출') {
-            const month = date.substring(0, 7); // YYYY-MM
-            if (!SAMPLE_DATA.expenses[month]) {
-                SAMPLE_DATA.expenses[month] = {};
-                SAMPLE_DATA.expenseCategories.forEach(cat => {
-                    SAMPLE_DATA.expenses[month][cat] = 0;
-                });
-            }
-            if (SAMPLE_DATA.expenseCategories.includes(category)) {
-                SAMPLE_DATA.expenses[month][category] = amount;
-            }
+        const month = date.substring(0, 7); // YYYY-MM
+        
+        // 월별 데이터 초기화
+        if (!APP_DATA.income[month]) {
+            APP_DATA.income[month] = {};
+            APP_DATA.incomeCategories.forEach(cat => {
+                APP_DATA.income[month][cat] = 0;
+            });
+        }
+        if (!APP_DATA.expenses[month]) {
+            APP_DATA.expenses[month] = {};
+            APP_DATA.expenseCategories.forEach(cat => {
+                APP_DATA.expenses[month][cat] = 0;
+            });
+        }
+        
+        // 유형에 따라 분류
+        if (type === '수입' && APP_DATA.incomeCategories.includes(category)) {
+            APP_DATA.income[month][category] += amount;
+        } else if (type === '지출' && APP_DATA.expenseCategories.includes(category)) {
+            APP_DATA.expenses[month][category] += amount;
         }
     }
 }
@@ -199,7 +214,7 @@ async function saveSavingsToSheet() {
         const headers = ['예금명', '예금주', '잔액', '신규일', '만기일', '자동이체일', '월납액', '비고', '이율'];
         const rows = [headers];
         
-        SAMPLE_DATA.savings.forEach(s => {
+        APP_DATA.savings.forEach(s => {
             rows.push([
                 s.name,
                 s.holder,
@@ -222,23 +237,42 @@ async function saveSavingsToSheet() {
     }
 }
 
-// 지출 데이터 저장
-async function saveExpensesToSheet() {
+// 거래 데이터 저장
+async function saveTransactionsToSheet() {
     try {
         showLoading('저장 중...');
         
         const headers = ['날짜', '유형', '카테고리', '금액', '메모', '반복', '주기'];
         const rows = [headers];
         
-        // SAMPLE_DATA.expenses를 transactions 형식으로 변환
-        Object.keys(SAMPLE_DATA.expenses).forEach(month => {
-            const expenses = SAMPLE_DATA.expenses[month];
+        // 수입 데이터 변환
+        Object.keys(APP_DATA.income).forEach(month => {
+            const income = APP_DATA.income[month];
+            Object.keys(income).forEach(category => {
+                const amount = income[category];
+                if (amount > 0) {
+                    rows.push([
+                        `${month}-01`,
+                        '수입',
+                        category,
+                        amount,
+                        '',
+                        'False',
+                        ''
+                    ]);
+                }
+            });
+        });
+        
+        // 지출 데이터 변환
+        Object.keys(APP_DATA.expenses).forEach(month => {
+            const expenses = APP_DATA.expenses[month];
             Object.keys(expenses).forEach(category => {
                 const amount = expenses[category];
                 if (amount > 0) {
                     rows.push([
                         `${month}-01`,
-                        '고정지출',
+                        '지출',
                         category,
                         amount,
                         '',
